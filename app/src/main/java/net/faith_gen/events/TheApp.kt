@@ -12,6 +12,7 @@ class TheApp: Application() {
         GoodPrefs.init(this)
         try {
             SDK.initializeSDK(this, this.assets.open("config.json"), resources.getString(R.color.colorPrimary), null)
+            SDK.initializeApiBase("http://192.168.0.112:8001/api/")
         } catch (e: IOException) {
             e.printStackTrace()
         }
