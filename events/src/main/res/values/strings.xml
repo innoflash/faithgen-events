@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">events</string>
+    <string name="no_events">No events recorded as yet</string>
 </resources>

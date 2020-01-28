@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<net.innoflash.iosview.lists.ListItemView3
+    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:scaleType="centerInside"
+    app:item_circular_image="false"
+    app:item_content="@string/loading"
+    app:item_heading="@string/loading"
+    app:item_icon="@drawable/main_calendar"
+    app:item_footer="@string/loading"
+    app:item_icon_padding="@dimen/dimen5"
+    android:layout_height="wrap_content"/>
