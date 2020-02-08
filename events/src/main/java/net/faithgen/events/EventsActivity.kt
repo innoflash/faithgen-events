@@ -1,6 +1,8 @@
 package net.faithgen.events
 
 import android.os.Bundle
+import android.view.View
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.events.calendar.views.EventsCalendar
 import kotlinx.android.synthetic.main.activity_events.*
 import net.faithgen.events.models.APIDate
@@ -12,9 +14,11 @@ import net.faithgen.sdk.http.ErrorResponse
 import net.faithgen.sdk.http.types.ServerResponse
 import net.faithgen.sdk.singletons.GSONSingleton
 import net.faithgen.sdk.utils.Dialogs
+import net.innoflash.iosview.recyclerview.RecyclerTouchListener
+import net.innoflash.iosview.recyclerview.RecyclerViewClickListener
 import java.util.*
 
-class EventsActivity : FaithGenActivity(), EventsCalendar.Callback {
+class EventsActivity : FaithGenActivity(), EventsCalendar.Callback, RecyclerViewClickListener {
     private var params = hashMapOf<String, String>()
     private var eventsList: List<Event>? = null
     private var eventsData: EventsData? = null
@@ -32,6 +36,9 @@ class EventsActivity : FaithGenActivity(), EventsCalendar.Callback {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_events)
         // toolbar.visibility = View.GONE
+
+        eventsView.layoutManager = LinearLayoutManager(this)
+        eventsView.addOnItemTouchListener(RecyclerTouchListener(this@EventsActivity, eventsView, this))
 
         selected.text = getDateString(eventsCalendar.getCurrentSelectedDate()?.timeInMillis)
 
@@ -56,10 +63,7 @@ class EventsActivity : FaithGenActivity(), EventsCalendar.Callback {
     }
 
     private fun loadEvents(currentDate: Calendar?) {
-        var currentMonth = currentDate!!.get(Calendar.MONTH) + 1
-        if(currentMonth > 12) currentMonth = 1
-
-        val date = "${currentDate.get(Calendar.YEAR)}-${currentMonth}-01"
+        val date = "${currentDate!!.get(Calendar.YEAR)}-${getMonth(currentDate)}-01"
         queriedDate = date
         params.put("date", date)
         API.get(this, Constants.ALL_EVENTS, params, false, object : ServerResponse() {
@@ -128,11 +132,42 @@ class EventsActivity : FaithGenActivity(), EventsCalendar.Callback {
 
     override fun onDaySelected(selectedDate: Calendar?) {
         selected.text = getDateString(selectedDate?.timeInMillis)
-        //todo render events for this date
+        var dailyEvents = getDailyEvents(selectedDate)
+        val adapter = EventsAdapter(this@EventsActivity, dailyEvents)
+        eventsView.adapter = adapter
     }
 
     override fun onMonthChanged(monthStartDate: Calendar?) {
         //clear recyclerview
         loadEvents(monthStartDate)
+    }
+
+    private fun getDailyEvents(selectedDate: Calendar?) : List<Event>{
+        return eventsList!!.filter {
+            val startWith = "${selectedDate!!.get(Calendar.YEAR)}-${getMonth(selectedDate)}-${getDay(selectedDate)}"
+            it.start.exact.startsWith(startWith)
+        }
+    }
+
+    private fun getMonth(selectedDate: Calendar?) : String {
+        var currentMonth = selectedDate!!.get(Calendar.MONTH) + 1
+        if(currentMonth > 12) currentMonth = 1
+
+        if(currentMonth.toString().length < 2) return "0${currentMonth}"
+        return currentMonth.toString()
+    }
+
+    private fun getDay(selectedDate: Calendar?) : String {
+        if(selectedDate!!.get(Calendar.DAY_OF_MONTH).toString().length < 2)
+            return "0${selectedDate.get(Calendar.DAY_OF_MONTH)}"
+        return selectedDate.get(Calendar.DAY_OF_MONTH).toString()
+    }
+
+    override fun onClick(view: View?, position: Int) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun onLongClick(view: View?, position: Int) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 }
