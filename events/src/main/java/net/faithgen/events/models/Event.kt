@@ -1,7 +1,6 @@
 package net.faithgen.events.models
 
 import com.google.gson.annotations.SerializedName
-import net.faithgen.sdk.models.Date
 
 data class Event(
     val id : String,

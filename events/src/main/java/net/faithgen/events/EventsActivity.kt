@@ -5,6 +5,7 @@ import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.events.calendar.views.EventsCalendar
 import kotlinx.android.synthetic.main.activity_events.*
+import net.faithgen.events.dialogs.EventDetails
 import net.faithgen.events.models.APIDate
 import net.faithgen.events.models.Event
 import net.faithgen.events.models.EventsData
@@ -16,6 +17,7 @@ import net.faithgen.sdk.singletons.GSONSingleton
 import net.faithgen.sdk.utils.Dialogs
 import net.innoflash.iosview.recyclerview.RecyclerTouchListener
 import net.innoflash.iosview.recyclerview.RecyclerViewClickListener
+import java.lang.Exception
 import java.util.*
 
 class EventsActivity : FaithGenActivity(), EventsCalendar.Callback, RecyclerViewClickListener {
@@ -59,7 +61,10 @@ class EventsActivity : FaithGenActivity(), EventsCalendar.Callback, RecyclerView
 
     override fun onStart() {
         super.onStart()
-        loadEvents(Calendar.getInstance())
+        if(eventsList === null){
+            clearEvents()
+            loadEvents(Calendar.getInstance())
+        }
     }
 
     private fun loadEvents(currentDate: Calendar?) {
@@ -132,13 +137,15 @@ class EventsActivity : FaithGenActivity(), EventsCalendar.Callback, RecyclerView
 
     override fun onDaySelected(selectedDate: Calendar?) {
         selected.text = getDateString(selectedDate?.timeInMillis)
-        var dailyEvents = getDailyEvents(selectedDate)
-        val adapter = EventsAdapter(this@EventsActivity, dailyEvents)
-        eventsView.adapter = adapter
+        try {
+            var dailyEvents = getDailyEvents(selectedDate)
+            val adapter = EventsAdapter(this@EventsActivity, dailyEvents)
+            eventsView.adapter = adapter
+        }catch (ex : Exception){}
     }
 
     override fun onMonthChanged(monthStartDate: Calendar?) {
-        //clear recyclerview
+        clearEvents()
         loadEvents(monthStartDate)
     }
 
@@ -164,10 +171,15 @@ class EventsActivity : FaithGenActivity(), EventsCalendar.Callback, RecyclerView
     }
 
     override fun onClick(view: View?, position: Int) {
-
+        val eventDetails: EventDetails = EventDetails(eventsList!!.get(position))
+        eventDetails.show(supportFragmentManager, Constants.EVENT_DIALOG_TAG)
     }
 
     override fun onLongClick(view: View?, position: Int) {
         //leave as is
+    }
+
+    private fun clearEvents(){
+        eventsView.adapter = EventsAdapter(this@EventsActivity, listOf())
     }
 }
