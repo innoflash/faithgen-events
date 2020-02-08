@@ -3,15 +3,15 @@ package net.faithgen.events.models
 import com.google.gson.annotations.SerializedName
 import net.faithgen.sdk.models.Date
 
-class Event {
-    var id : String? = null
-    var name : String? = null
-    var description : String? = null
-    var date : String? = null
-    var published: Boolean? = null
+data class Event(
+    val id : String,
+    val name : String,
+    val description : String,
+    val date : String,
+    val published: Boolean,
     @SerializedName("is_past")
-    var isPast: Boolean = false
-    var start: Date? = null
-    var end: Date? = null
-    var location: Location? = null
-}
+    val isPast: Boolean,
+    val start: Date,
+    val end: Date,
+    val location: Location
+)
