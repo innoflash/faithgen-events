@@ -12,6 +12,7 @@ import net.faithgen.events.models.Event
 import net.innoflash.iosview.DialogFullScreen
 import net.innoflash.iosview.DialogToolbar
 import net.innoflash.iosview.lists.ListItemView2
+import net.innoflash.iosview.lists.ListItemView3
 
 class EventDetails(val event: Event) : DialogFullScreen() {
 
@@ -20,6 +21,7 @@ class EventDetails(val event: Event) : DialogFullScreen() {
     private var eventDescription: TextView? = null
     private var eventStart: ListItemView2? = null
     private var eventEnd: ListItemView2? = null
+    private var eventLocation: ListItemView3? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -32,6 +34,7 @@ class EventDetails(val event: Event) : DialogFullScreen() {
         eventDescription = rootView.findViewById(R.id.eventDescription) as TextView
         eventStart = rootView.findViewById(R.id.eventStart) as ListItemView2
         eventEnd = rootView.findViewById(R.id.eventEnd) as ListItemView2
+        eventLocation = rootView.findViewById(R.id.eventLocation) as ListItemView3
 
         dialogToolbar!!.dialogFragment = this
         return rootView
@@ -44,5 +47,6 @@ class EventDetails(val event: Event) : DialogFullScreen() {
         eventDescription!!.text = event.description
         eventStart!!.content = "${event.start.formatted} : ${event.start.time}"
         eventEnd!!.content = "${event.end.formatted} : ${event.end.time}"
+        //todo fill up the location
     }
 }

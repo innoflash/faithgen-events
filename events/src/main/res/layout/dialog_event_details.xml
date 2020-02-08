@@ -92,10 +92,13 @@
                         android:orientation="vertical">
 
                         <net.innoflash.iosview.lists.ListItemView3
+                            android:id="@+id/eventLocation"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:scaleType="centerInside"
                             app:item_circular_image="false"
-                            app:item_icon="@drawable/stopwatch" />
+                            app:item_icon="@drawable/stopwatch"
+                            app:item_icon_padding="15dp" />
                     </LinearLayout>
 
                 </androidx.cardview.widget.CardView>
