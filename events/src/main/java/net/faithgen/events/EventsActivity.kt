@@ -164,10 +164,10 @@ class EventsActivity : FaithGenActivity(), EventsCalendar.Callback, RecyclerView
     }
 
     override fun onClick(view: View?, position: Int) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+
     }
 
     override fun onLongClick(view: View?, position: Int) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        //leave as is
     }
 }
