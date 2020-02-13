@@ -1,5 +1,6 @@
 package net.faithgen.events
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -171,8 +172,9 @@ class EventsActivity : FaithGenActivity(), EventsCalendar.Callback, RecyclerView
     }
 
     override fun onClick(view: View?, position: Int) {
-        val eventDetails: EventDetails = EventDetails(eventsList!!.get(position))
-        eventDetails.show(supportFragmentManager, Constants.EVENT_DIALOG_TAG)
+        val intent : Intent = Intent(this, EventActivity::class.java)
+        intent.putExtra(Constants.EVENT_ID, eventsList!!.get(position).id)
+        startActivity(intent)
     }
 
     override fun onLongClick(view: View?, position: Int) {
