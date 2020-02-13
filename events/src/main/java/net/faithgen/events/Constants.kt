@@ -2,6 +2,8 @@ package net.faithgen.events
 
 class Constants {
     companion object{
+        const val MENU: String = "Menu"
+        const val COMMENT: String = "Comment"
         const val EVENT_ID: String = "event_id"
         const val EVENT_DETAILS: String = "Event Details"
         const val EVENTS : String = "Events"

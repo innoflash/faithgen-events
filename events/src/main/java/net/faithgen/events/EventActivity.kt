@@ -8,17 +8,22 @@ import kotlinx.android.synthetic.main.activity_event_details.*
 import net.faithgen.events.adapters.GuestsAdapter
 import net.faithgen.events.models.Event
 import net.faithgen.sdk.FaithGenActivity
+import net.faithgen.sdk.SDK
+import net.faithgen.sdk.comments.CommentsSettings
+import net.faithgen.sdk.enums.CommentsDisplay
 import net.faithgen.sdk.http.API
 import net.faithgen.sdk.http.ErrorResponse
 import net.faithgen.sdk.http.types.ServerResponse
+import net.faithgen.sdk.menu.MenuFactory
+import net.faithgen.sdk.menu.MenuItem
 import net.faithgen.sdk.singletons.GSONSingleton
 import net.faithgen.sdk.utils.Dialogs
 import net.faithgen.sdk.utils.Utils
-import net.innoflash.iosview.utils.FlashUtils.openLink
 
 class EventActivity : FaithGenActivity() {
 
     var event: Event? = null
+    val menuItems = mutableListOf<MenuItem>()
     private val eventId: String by lazy {
         intent.getStringExtra(Constants.EVENT_ID)
     }
@@ -31,6 +36,27 @@ class EventActivity : FaithGenActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_event_details)
         eventGuests.layoutManager = LinearLayoutManager(this)
+
+        initMenu()
+    }
+
+    private fun initMenu(){
+        menuItems.add(MenuItem(R.drawable.ic_comment_24, Constants.COMMENT))
+        val menu = MenuFactory.initializeMenu(this, menuItems)
+
+        menu.setOnMenuItemListener(Constants.MENU) { menuItem, position ->
+            when(position){
+                0 -> SDK.openComments(this@EventActivity,
+                    CommentsSettings.Builder()
+                        .setTitle(event!!.name)
+                        .setItemId(eventId)
+                        .setCategory("events/")
+                        .setCommentsDisplay(CommentsDisplay.DIALOG)
+                        .build())
+            }
+        }
+
+        setOnOptionsClicked { menu.show() }
     }
 
     override fun onStart() {
@@ -58,7 +84,7 @@ class EventActivity : FaithGenActivity() {
             })
     }
 
-    private fun displayGuests(){
+    private fun displayGuests() {
         val adapter = GuestsAdapter(this, event!!.guests)
         eventGuests.adapter = adapter
     }
@@ -76,7 +102,7 @@ class EventActivity : FaithGenActivity() {
         /**
          * Displays the guests
          */
-        when(event?.guests?.size){
+        when (event?.guests?.size) {
             0 -> hasGuests.visibility = View.GONE
             else -> displayGuests()
         }
