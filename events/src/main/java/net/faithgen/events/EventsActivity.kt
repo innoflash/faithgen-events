@@ -6,7 +6,7 @@ import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.events.calendar.views.EventsCalendar
 import kotlinx.android.synthetic.main.activity_events.*
-import net.faithgen.events.dialogs.EventDetails
+import net.faithgen.events.adapters.EventsAdapter
 import net.faithgen.events.models.APIDate
 import net.faithgen.events.models.Event
 import net.faithgen.events.models.EventsData
@@ -141,7 +141,10 @@ class EventsActivity : FaithGenActivity(), EventsCalendar.Callback, RecyclerView
         selected.text = getDateString(selectedDate?.timeInMillis)
         try {
             var dailyEvents = getDailyEvents(selectedDate)
-            val adapter = EventsAdapter(this@EventsActivity, dailyEvents)
+            val adapter = EventsAdapter(
+                this@EventsActivity,
+                dailyEvents
+            )
             eventsView.adapter = adapter
         }catch (ex : Exception){}
     }
@@ -184,6 +187,9 @@ class EventsActivity : FaithGenActivity(), EventsCalendar.Callback, RecyclerView
     }
 
     private fun clearEvents(){
-        eventsView.adapter = EventsAdapter(this@EventsActivity, listOf())
+        eventsView.adapter = EventsAdapter(
+            this@EventsActivity,
+            listOf()
+        )
     }
 }

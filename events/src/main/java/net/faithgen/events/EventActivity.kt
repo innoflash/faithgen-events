@@ -2,8 +2,10 @@ package net.faithgen.events
 
 import android.os.Bundle
 import android.view.View
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_event_details.*
+import net.faithgen.events.adapters.GuestsAdapter
 import net.faithgen.events.models.Event
 import net.faithgen.sdk.FaithGenActivity
 import net.faithgen.sdk.http.API
@@ -28,6 +30,7 @@ class EventActivity : FaithGenActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_event_details)
+        eventGuests.layoutManager = LinearLayoutManager(this)
     }
 
     override fun onStart() {
@@ -55,6 +58,11 @@ class EventActivity : FaithGenActivity() {
             })
     }
 
+    private fun displayGuests(){
+        val adapter = GuestsAdapter(this, event!!.guests)
+        eventGuests.adapter = adapter
+    }
+
     private fun renderEvent(event: Event?) {
         toolbar.pageTitle = event?.name
         eventName.text = event?.name
@@ -65,6 +73,17 @@ class EventActivity : FaithGenActivity() {
         eventLocation.itemContent = event?.location?.locality
         eventLocation.itemFooter = event?.location?.country
 
+        /**
+         * Displays the guests
+         */
+        when(event?.guests?.size){
+            0 -> hasGuests.visibility = View.GONE
+            else -> displayGuests()
+        }
+
+        /**
+         * Shows the event banner
+         */
         when (event?.avatar) {
             null -> eventBanner.visibility = View.GONE
             else -> {
@@ -77,11 +96,16 @@ class EventActivity : FaithGenActivity() {
             }
         }
 
-
+        /**
+         * Shows event links
+         */
         if (event?.url === null && event?.video_url === null) {
             linksWrapper.visibility = View.GONE
             hasUrls.visibility = View.GONE
         } else {
+            /**
+             * Shows the link if there
+             */
             when (event?.url) {
                 null -> eventLink.visibility = View.GONE
                 else -> eventLink.setOnClickListener { view ->
@@ -92,6 +116,9 @@ class EventActivity : FaithGenActivity() {
                 }
             }
 
+            /**
+             * Shows the video url if there
+             */
             when (event?.video_url) {
                 null -> eventVideoLink.visibility = View.GONE
                 else -> eventVideoLink.setOnClickListener { view ->
