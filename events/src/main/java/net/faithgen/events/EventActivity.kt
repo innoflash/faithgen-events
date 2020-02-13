@@ -1,6 +1,7 @@
 package net.faithgen.events
 
 import android.os.Bundle
+import kotlinx.android.synthetic.main.dialog_event_details.*
 import net.faithgen.events.models.Event
 import net.faithgen.sdk.FaithGenActivity
 import net.faithgen.sdk.http.API
@@ -45,6 +46,12 @@ class EventActivity :FaithGenActivity() {
     }
 
     private fun renderEvent(event: Event?) {
-
+        eventName.text = event?.name
+        eventDescription!!.text = event?.description
+        eventStart!!.content = "${event?.start?.formatted} : ${event?.start?.time}"
+        eventEnd!!.content = "${event?.end?.formatted} : ${event?.end?.time}"
+        eventLocation.itemHeading = event?.location?.address?.name
+        eventLocation.itemContent = event?.location?.locality
+        eventLocation.itemFooter = event?.location?.country
     }
 }
