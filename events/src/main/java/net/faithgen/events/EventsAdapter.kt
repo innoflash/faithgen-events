@@ -12,15 +12,14 @@ import net.innoflash.iosview.lists.ListItemView3
 
 class EventsAdapter(private val context: Context, private val events: List<Event>) :
     RecyclerView.Adapter<EventViewHolder>() {
-    private var layoutInflater: LayoutInflater?
 
-    init {
-        layoutInflater = LayoutInflater.from(this.context)
+    private val layoutInflater: LayoutInflater by lazy {
+       LayoutInflater.from(this.context)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): EventViewHolder {
         return EventViewHolder(
-            layoutInflater!!.inflate(
+            layoutInflater.inflate(
                 R.layout.list_item_event,
                 parent,
                 false
@@ -36,7 +35,7 @@ class EventsAdapter(private val context: Context, private val events: List<Event
         holder.eventView.itemHeading = SDK.getMinistry().name
         holder.eventView.itemContent = events.get(position).name
         holder.eventView.itemFooter = events.get(position).date
-        if (events.get(position).isPast) {
+        if (events.get(position).is_past) {
             holder.eventView.isHasType = true
             holder.eventView.badge = "past"
             holder.eventView.itemType = ListItemView3.ItemType.RED

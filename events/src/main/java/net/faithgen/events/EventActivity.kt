@@ -1,9 +1,21 @@
 package net.faithgen.events
 
 import android.os.Bundle
+import net.faithgen.events.models.Event
 import net.faithgen.sdk.FaithGenActivity
+import net.faithgen.sdk.http.API
+import net.faithgen.sdk.http.ErrorResponse
+import net.faithgen.sdk.http.types.ServerResponse
+import net.faithgen.sdk.singletons.GSONSingleton
+import net.faithgen.sdk.utils.Dialogs
 
 class EventActivity :FaithGenActivity() {
+
+    var event : Event? = null
+    private val eventId: String by lazy {
+        intent.getStringExtra(Constants.EVENT_ID)
+    }
+
     override fun getPageTitle(): String {
         return Constants.EVENT_DETAILS
     }
@@ -11,5 +23,28 @@ class EventActivity :FaithGenActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.dialog_event_details)
+    }
+
+    override fun onStart() {
+        super.onStart()
+        if(event === null) getEvent()
+    }
+
+    private fun getEvent(){
+        API.get(this@EventActivity, Constants.ALL_EVENTS +"/$eventId", null, false, object : ServerResponse() {
+            override fun onServerResponse(serverResponse: String?) {
+                event  = GSONSingleton.getInstance().gson.fromJson(serverResponse, Event::class.java)
+                renderEvent(event)
+            }
+
+            override fun onError(errorResponse: ErrorResponse?) {
+                //super.onError(errorResponse)
+                Dialogs.showOkDialog(this@EventActivity, errorResponse?.message, true)
+            }
+        })
+    }
+
+    private fun renderEvent(event: Event?) {
+
     }
 }
