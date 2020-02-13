@@ -22,8 +22,8 @@ import net.faithgen.sdk.utils.Utils
 
 class EventActivity : FaithGenActivity() {
 
-    var event: Event? = null
-    val menuItems = mutableListOf<MenuItem>()
+    private var event: Event? = null
+    private val menuItems = mutableListOf<MenuItem>()
     private val eventId: String by lazy {
         intent.getStringExtra(Constants.EVENT_ID)
     }
@@ -41,26 +41,20 @@ class EventActivity : FaithGenActivity() {
     private fun initMenu() {
         menuItems.add(MenuItem(R.drawable.ic_comment_24, Constants.COMMENT))
         menuItems.add(MenuItem(R.drawable.ic_share, Constants.INVITE_OTHERS))
+        menuItems.add(MenuItem(R.drawable.ic_navigate, Constants.NAVIGATE_VENUE))
         if (event?.video_url !== null)
             menuItems.add(MenuItem(R.drawable.ic_watch_video, Constants.WATCH_VIDEO))
+
         val menu = MenuFactory.initializeMenu(this, menuItems)
 
-        menu.setOnMenuItemListener(Constants.MENU) { menuItem, position ->
+        menu.setOnMenuItemListener(Constants.MENU) { _, position ->
             when (position) {
-                0 -> SDK.openComments(
-                    this@EventActivity,
-                    CommentsSettings.Builder()
-                        .setTitle(event!!.name)
-                        .setItemId(eventId)
-                        .setCategory("events/")
-                        .setCommentsDisplay(CommentsDisplay.DIALOG)
-                        .build()
-                )
+                0 -> openComments()
                 1 -> Utils.shareText(this@EventActivity, getInvitation())
-                2 -> Utils.openURL(this@EventActivity, event!!.video_url)
+                2 -> Utils.openURL(this@EventActivity, event?.location?.place_url)
+                3 -> Utils.openURL(this@EventActivity, event!!.video_url)
             }
         }
-
         setOnOptionsClicked { menu.show() }
     }
 
@@ -69,11 +63,24 @@ class EventActivity : FaithGenActivity() {
         if (event === null) getEvent()
     }
 
-    private fun getInvitation() =
-        "Hey there, i am inviting you to an event named \"${event?.name}\" hosted by ${SDK.getMinistry().name}\n" +
+    private fun openComments() {
+        return SDK.openComments(
+            this@EventActivity,
+            CommentsSettings.Builder()
+                .setTitle(event!!.name)
+                .setItemId(eventId)
+                .setCategory("events/")
+                .setCommentsDisplay(CommentsDisplay.DIALOG)
+                .build()
+        )
+    }
+
+    private fun getInvitation(): String {
+        return "Hey there, i am inviting you to an event named \"${event?.name}\" hosted by ${SDK.getMinistry().name}\n" +
                 "Its taking place on ${event?.start?.formatted} starting at ${event?.start?.time}\n\n" +
                 "For more information visit:\n" +
                 "https://faithgen.com/events/$eventId"
+    }
 
     private fun getEvent() {
         API.get(
@@ -83,8 +90,9 @@ class EventActivity : FaithGenActivity() {
             false,
             object : ServerResponse() {
                 override fun onServerResponse(serverResponse: String?) {
-                    event =
-                        GSONSingleton.getInstance().gson.fromJson(serverResponse, Event::class.java)
+                    event = GSONSingleton.getInstance()
+                        .gson
+                        .fromJson(serverResponse, Event::class.java)
                     renderEvent(event)
                     initMenu()
                 }
@@ -104,9 +112,9 @@ class EventActivity : FaithGenActivity() {
     private fun renderEvent(event: Event?) {
         toolbar.pageTitle = event?.name
         eventName.text = event?.name
-        eventDescription!!.text = event?.description
-        eventStart!!.content = "${event?.start?.formatted} : ${event?.start?.time}"
-        eventEnd!!.content = "${event?.end?.formatted} : ${event?.end?.time}"
+        eventDescription.text = event?.description
+        eventStart.content = "${event?.start?.formatted} : ${event?.start?.time}"
+        eventEnd.content = "${event?.end?.formatted} : ${event?.end?.time}"
         eventLocation.itemHeading = event?.location?.address?.name
         eventLocation.itemContent = event?.location?.locality
         eventLocation.itemFooter = event?.location?.country
@@ -147,10 +155,7 @@ class EventActivity : FaithGenActivity() {
             when (event?.url) {
                 null -> eventLink.visibility = View.GONE
                 else -> eventLink.setOnClickListener { view ->
-                    Utils.openURL(
-                        this@EventActivity,
-                        event.url
-                    )
+                    Utils.openURL(this@EventActivity, event.url)
                 }
             }
 
@@ -160,10 +165,7 @@ class EventActivity : FaithGenActivity() {
             when (event?.video_url) {
                 null -> eventVideoLink.visibility = View.GONE
                 else -> eventVideoLink.setOnClickListener { view ->
-                    Utils.openURL(
-                        this@EventActivity,
-                        event.video_url
-                    )
+                    Utils.openURL(this@EventActivity, event.video_url)
                 }
             }
         }
