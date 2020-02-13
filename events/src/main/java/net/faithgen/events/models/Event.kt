@@ -1,16 +1,19 @@
 package net.faithgen.events.models
 
-import com.google.gson.annotations.SerializedName
+import net.faithgen.sdk.models.Avatar
 
 data class Event(
-    val id : String,
-    val name : String,
-    val description : String,
-    val date : String,
+    val id: String,
+    val name: String,
+    val description: String,
+    val url: String,
+    val video_url: String,
+    val date: String,
     val published: Boolean,
-    @SerializedName("is_past")
-    val isPast: Boolean,
+    val is_past: Boolean,
     val start: Date,
     val end: Date,
-    val location: Location
+    val location: Location,
+    val avatar: Avatar,
+    val guests: List<Guest>
 )
