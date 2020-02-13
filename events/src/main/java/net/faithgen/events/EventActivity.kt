@@ -1,6 +1,8 @@
 package net.faithgen.events
 
 import android.os.Bundle
+import android.view.View
+import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.dialog_event_details.*
 import net.faithgen.events.models.Event
 import net.faithgen.sdk.FaithGenActivity
@@ -46,6 +48,7 @@ class EventActivity :FaithGenActivity() {
     }
 
     private fun renderEvent(event: Event?) {
+        toolbar.pageTitle = event?.name
         eventName.text = event?.name
         eventDescription!!.text = event?.description
         eventStart!!.content = "${event?.start?.formatted} : ${event?.start?.time}"
@@ -53,5 +56,17 @@ class EventActivity :FaithGenActivity() {
         eventLocation.itemHeading = event?.location?.address?.name
         eventLocation.itemContent = event?.location?.locality
         eventLocation.itemFooter = event?.location?.country
+
+        when(event?.avatar){
+            null -> eventBanner.visibility = View.GONE
+            else -> {
+                eventBanner.visibility = View.VISIBLE
+                Picasso.get()
+                    .load(event.avatar.original)
+                    .placeholder(R.drawable.main_calendar)
+                    .error(R.drawable.main_calendar)
+                    .into(eventBanner)
+            }
+        }
     }
 }

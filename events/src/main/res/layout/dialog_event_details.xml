@@ -10,6 +10,15 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
+        <ImageView
+            android:id="@+id/eventBanner"
+            android:visibility="gone"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:src="@drawable/main_calendar"
+            android:scaleType="fitCenter"
+            android:adjustViewBounds="true"/>
+
         <LinearLayout
             style="@style/block"
             android:layout_width="match_parent"
@@ -86,7 +95,7 @@
                         android:layout_height="wrap_content"
                         android:scaleType="centerInside"
                         app:item_circular_image="false"
-                        app:item_icon="@drawable/stopwatch"
+                        app:item_icon="@drawable/map_spotter"
                         app:item_icon_padding="15dp" />
                 </LinearLayout>
 
