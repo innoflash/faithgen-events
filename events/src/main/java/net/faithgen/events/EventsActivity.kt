@@ -1,10 +1,18 @@
 package net.faithgen.events
 
+import android.Manifest
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.events.calendar.views.EventsCalendar
+import com.karumi.dexter.Dexter
+import com.karumi.dexter.PermissionToken
+import com.karumi.dexter.listener.PermissionDeniedResponse
+import com.karumi.dexter.listener.PermissionGrantedResponse
+import com.karumi.dexter.listener.PermissionRequest
+import com.karumi.dexter.listener.single.PermissionListener
 import kotlinx.android.synthetic.main.activity_events.*
 import net.faithgen.events.adapters.EventsAdapter
 import net.faithgen.events.models.APIDate
@@ -14,14 +22,17 @@ import net.faithgen.sdk.FaithGenActivity
 import net.faithgen.sdk.http.API
 import net.faithgen.sdk.http.ErrorResponse
 import net.faithgen.sdk.http.types.ServerResponse
+import net.faithgen.sdk.interfaces.DialogListener
 import net.faithgen.sdk.singletons.GSONSingleton
 import net.faithgen.sdk.utils.Dialogs
+import net.faithgen.sdk.utils.Utils
 import net.innoflash.iosview.recyclerview.RecyclerTouchListener
 import net.innoflash.iosview.recyclerview.RecyclerViewClickListener
 import java.lang.Exception
 import java.util.*
 
-class EventsActivity : FaithGenActivity(), EventsCalendar.Callback, RecyclerViewClickListener {
+class EventsActivity : FaithGenActivity(), EventsCalendar.Callback, RecyclerViewClickListener,
+    PermissionListener {
     private var params = hashMapOf<String, String>()
     private var eventsList: List<Event>? = null
     private var dateEvents: List<Event>? = null
@@ -63,6 +74,10 @@ class EventsActivity : FaithGenActivity(), EventsCalendar.Callback, RecyclerView
 
     override fun onStart() {
         super.onStart()
+        Dexter.withActivity(this)
+            .withPermission(Manifest.permission.WRITE_CALENDAR)
+            .withListener(this)
+            .check()
         if(eventsList === null){
             clearEvents()
             loadEvents(Calendar.getInstance())
@@ -191,5 +206,24 @@ class EventsActivity : FaithGenActivity(), EventsCalendar.Callback, RecyclerView
             this@EventsActivity,
             listOf()
         )
+    }
+
+    override fun onPermissionGranted(response: PermissionGrantedResponse?) {
+        Toast.makeText(this, "Good to go", Toast.LENGTH_SHORT).show()
+    }
+
+    override fun onPermissionRationaleShouldBeShown(
+        permission: PermissionRequest?,
+        token: PermissionToken?
+    ) {
+
+    }
+
+    override fun onPermissionDenied(response: PermissionDeniedResponse?) {
+        Dialogs.confirmDialog(this, Constants.CALENDAR_PERMISSION, Constants.CALENDAR_PERMISSION_DENIED, object : DialogListener() {
+            override fun onYes() {
+                Utils.openSettings(this@EventsActivity)
+            }
+        })
     }
 }

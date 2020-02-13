@@ -1,5 +1,7 @@
 package net.faithgen.events
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -14,6 +16,7 @@ import net.faithgen.sdk.enums.CommentsDisplay
 import net.faithgen.sdk.http.API
 import net.faithgen.sdk.http.ErrorResponse
 import net.faithgen.sdk.http.types.ServerResponse
+import net.faithgen.sdk.interfaces.DialogListener
 import net.faithgen.sdk.menu.MenuFactory
 import net.faithgen.sdk.menu.MenuItem
 import net.faithgen.sdk.singletons.GSONSingleton
@@ -42,6 +45,7 @@ class EventActivity : FaithGenActivity() {
         menuItems.add(MenuItem(R.drawable.ic_comment_24, Constants.COMMENT))
         menuItems.add(MenuItem(R.drawable.ic_share, Constants.INVITE_OTHERS))
         menuItems.add(MenuItem(R.drawable.ic_navigate, Constants.NAVIGATE_VENUE))
+        menuItems.add(MenuItem(R.drawable.ic_calendar_add, Constants.MARK_ON_CALENDAR))
         if (event?.video_url !== null)
             menuItems.add(MenuItem(R.drawable.ic_watch_video, Constants.WATCH_VIDEO))
 
@@ -52,7 +56,8 @@ class EventActivity : FaithGenActivity() {
                 0 -> openComments()
                 1 -> Utils.shareText(this@EventActivity, getInvitation())
                 2 -> Utils.openURL(this@EventActivity, event?.location?.place_url)
-                3 -> Utils.openURL(this@EventActivity, event!!.video_url)
+                3 -> addToCalendar()
+                4 -> Utils.openURL(this@EventActivity, event!!.video_url)
             }
         }
         setOnOptionsClicked { menu.show() }
@@ -61,6 +66,20 @@ class EventActivity : FaithGenActivity() {
     override fun onStart() {
         super.onStart()
         if (event === null) getEvent()
+    }
+
+    private fun addToCalendar() {
+        if (checkCallingOrSelfPermission(Manifest.permission.WRITE_CALENDAR) == PackageManager.PERMISSION_GRANTED) {
+
+        } else Dialogs.confirmDialog(
+            this,
+            Constants.CALENDAR_PERMISSION,
+            Constants.CALENDAR_DENIED_PERMISSION,
+            object : DialogListener() {
+                override fun onYes() {
+                    Utils.openSettings(this@EventActivity)
+                }
+            })
     }
 
     private fun openComments() {
@@ -90,8 +109,7 @@ class EventActivity : FaithGenActivity() {
             false,
             object : ServerResponse() {
                 override fun onServerResponse(serverResponse: String?) {
-                    event = GSONSingleton.getInstance()
-                        .gson
+                    event = GSONSingleton.getInstance().gson
                         .fromJson(serverResponse, Event::class.java)
                     renderEvent(event)
                     initMenu()
