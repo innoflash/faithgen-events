@@ -29,7 +29,7 @@ class EventDetails(val event: Event) : DialogFullScreen() {
         savedInstanceState: Bundle?
     ): View? {
         val rootView = inflater.inflate(R.layout.dialog_event_details, container, false)
-        dialogToolbar = rootView.findViewById(R.id.dialogToolbar) as DialogToolbar
+        //dialogToolbar = rootView.findViewById(R.id.dialogToolbar) as DialogToolbar
         eventName = rootView.findViewById(R.id.eventName) as TextView
         eventDescription = rootView.findViewById(R.id.eventDescription) as TextView
         eventStart = rootView.findViewById(R.id.eventStart) as ListItemView2
@@ -42,7 +42,7 @@ class EventDetails(val event: Event) : DialogFullScreen() {
 
     override fun onStart() {
         super.onStart()
-        dialogToolbar!!.title = event.name
+       // dialogToolbar!!.title = event.name
         eventName!!.text = event.name
         eventDescription!!.text = event.description
         eventStart!!.content = "${event.start.formatted} : ${event.start.time}"

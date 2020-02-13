@@ -1,110 +1,97 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/ios_background"
-    android:orientation="vertical">
+    android:background="@color/ios_background">
 
-    <net.innoflash.iosview.DialogToolbar
-        android:id="@+id/dialogToolbar"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:ios_dialog_title="@string/loading" />
-
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:orientation="vertical">
 
         <LinearLayout
+            style="@style/block"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <LinearLayout
-                style="@style/block"
+            <TextView
+                android:id="@+id/eventName"
+                style="@style/block_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:text="@string/loading" />
 
-                <TextView
-                    android:id="@+id/eventName"
-                    style="@style/block_title"
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/loading" />
+                    android:orientation="vertical">
 
-                <androidx.cardview.widget.CardView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-
-                    <LinearLayout
+                    <net.innoflash.iosview.lists.ListItemView2
+                        android:id="@+id/eventStart"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical">
+                        android:scaleType="centerInside"
+                        app:liv2_circular_image="false"
+                        app:liv2_content_text="@string/loading"
+                        app:liv2_head_text="@string/eventStart"
+                        app:liv2_header_color="@color/ios_blue"
+                        app:liv2_icon="@drawable/main_calendar"
+                        app:liv2_icon_padding="15dp" />
 
-                        <net.innoflash.iosview.lists.ListItemView2
-                            android:id="@+id/eventStart"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:scaleType="centerInside"
-                            app:liv2_circular_image="false"
-                            app:liv2_content_text="@string/loading"
-                            app:liv2_head_text="@string/eventStart"
-                            app:liv2_header_color="@color/ios_blue"
-                            app:liv2_icon="@drawable/main_calendar"
-                            app:liv2_icon_padding="15dp" />
+                    <net.innoflash.iosview.lists.ListItemView2
+                        android:id="@+id/eventEnd"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:scaleType="centerInside"
+                        app:liv2_circular_image="false"
+                        app:liv2_content_text="@string/loading"
+                        app:liv2_head_text="@string/eventEnd"
+                        app:liv2_header_color="@color/ios_blue"
+                        app:liv2_icon="@drawable/main_calendar"
+                        app:liv2_icon_padding="15dp" />
 
-                        <net.innoflash.iosview.lists.ListItemView2
-                            android:id="@+id/eventEnd"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:scaleType="centerInside"
-                            app:liv2_circular_image="false"
-                            app:liv2_content_text="@string/loading"
-                            app:liv2_head_text="@string/eventEnd"
-                            app:liv2_header_color="@color/ios_blue"
-                            app:liv2_icon="@drawable/main_calendar"
-                            app:liv2_icon_padding="15dp" />
+                    <TextView
+                        android:id="@+id/eventDescription"
+                        style="@style/helvetica_text"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/loading" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
 
-                        <TextView
-                            android:id="@+id/eventDescription"
-                            style="@style/helvetica_text"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="@string/loading" />
-                    </LinearLayout>
-                </androidx.cardview.widget.CardView>
+            <TextView
+                style="@style/block_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/location" />
 
-                <TextView
-                    style="@style/block_title"
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/location" />
+                    android:orientation="vertical">
 
-                <androidx.cardview.widget.CardView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-
-                    <LinearLayout
+                    <net.innoflash.iosview.lists.ListItemView3
+                        android:id="@+id/eventLocation"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical">
+                        android:scaleType="centerInside"
+                        app:item_circular_image="false"
+                        app:item_icon="@drawable/stopwatch"
+                        app:item_icon_padding="15dp" />
+                </LinearLayout>
 
-                        <net.innoflash.iosview.lists.ListItemView3
-                            android:id="@+id/eventLocation"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:scaleType="centerInside"
-                            app:item_circular_image="false"
-                            app:item_icon="@drawable/stopwatch"
-                            app:item_icon_padding="15dp" />
-                    </LinearLayout>
-
-                </androidx.cardview.widget.CardView>
-            </LinearLayout>
-
+            </androidx.cardview.widget.CardView>
         </LinearLayout>
-    </ScrollView>
 
-</LinearLayout>
+    </LinearLayout>
+</ScrollView>
