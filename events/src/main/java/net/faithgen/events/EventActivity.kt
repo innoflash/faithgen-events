@@ -11,10 +11,12 @@ import net.faithgen.sdk.http.ErrorResponse
 import net.faithgen.sdk.http.types.ServerResponse
 import net.faithgen.sdk.singletons.GSONSingleton
 import net.faithgen.sdk.utils.Dialogs
+import net.faithgen.sdk.utils.Utils
+import net.innoflash.iosview.utils.FlashUtils.openLink
 
-class EventActivity :FaithGenActivity() {
+class EventActivity : FaithGenActivity() {
 
-    var event : Event? = null
+    var event: Event? = null
     private val eventId: String by lazy {
         intent.getStringExtra(Constants.EVENT_ID)
     }
@@ -30,21 +32,27 @@ class EventActivity :FaithGenActivity() {
 
     override fun onStart() {
         super.onStart()
-        if(event === null) getEvent()
+        if (event === null) getEvent()
     }
 
-    private fun getEvent(){
-        API.get(this@EventActivity, Constants.ALL_EVENTS +"/$eventId", null, false, object : ServerResponse() {
-            override fun onServerResponse(serverResponse: String?) {
-                event  = GSONSingleton.getInstance().gson.fromJson(serverResponse, Event::class.java)
-                renderEvent(event)
-            }
+    private fun getEvent() {
+        API.get(
+            this@EventActivity,
+            Constants.ALL_EVENTS + "/$eventId",
+            null,
+            false,
+            object : ServerResponse() {
+                override fun onServerResponse(serverResponse: String?) {
+                    event =
+                        GSONSingleton.getInstance().gson.fromJson(serverResponse, Event::class.java)
+                    renderEvent(event)
+                }
 
-            override fun onError(errorResponse: ErrorResponse?) {
-                //super.onError(errorResponse)
-                Dialogs.showOkDialog(this@EventActivity, errorResponse?.message, true)
-            }
-        })
+                override fun onError(errorResponse: ErrorResponse?) {
+                    //super.onError(errorResponse)
+                    Dialogs.showOkDialog(this@EventActivity, errorResponse?.message, true)
+                }
+            })
     }
 
     private fun renderEvent(event: Event?) {
@@ -57,7 +65,7 @@ class EventActivity :FaithGenActivity() {
         eventLocation.itemContent = event?.location?.locality
         eventLocation.itemFooter = event?.location?.country
 
-        when(event?.avatar){
+        when (event?.avatar) {
             null -> eventBanner.visibility = View.GONE
             else -> {
                 eventBanner.visibility = View.VISIBLE
@@ -66,6 +74,32 @@ class EventActivity :FaithGenActivity() {
                     .placeholder(R.drawable.main_calendar)
                     .error(R.drawable.main_calendar)
                     .into(eventBanner)
+            }
+        }
+
+
+        if (event?.url === null && event?.video_url === null) {
+            linksWrapper.visibility = View.GONE
+            hasUrls.visibility = View.GONE
+        } else {
+            when (event?.url) {
+                null -> eventLink.visibility = View.GONE
+                else -> eventLink.setOnClickListener { view ->
+                    Utils.openURL(
+                        this@EventActivity,
+                        event.url
+                    )
+                }
+            }
+
+            when (event?.video_url) {
+                null -> eventVideoLink.visibility = View.GONE
+                else -> eventVideoLink.setOnClickListener { view ->
+                    Utils.openURL(
+                        this@EventActivity,
+                        event.video_url
+                    )
+                }
             }
         }
     }

@@ -4,4 +4,7 @@
     <string name="eventStart">Event starting</string>
     <string name="eventEnd">Event ending</string>
     <string name="location">Location</string>
+    <string name="event_links">Links</string>
+    <string name="visit_link">Visit Link</string>
+    <string name="watch_video">Watch Video</string>
 </resources>

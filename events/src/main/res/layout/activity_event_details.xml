@@ -12,12 +12,12 @@
 
         <ImageView
             android:id="@+id/eventBanner"
-            android:visibility="gone"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:src="@drawable/main_calendar"
+            android:adjustViewBounds="true"
             android:scaleType="fitCenter"
-            android:adjustViewBounds="true"/>
+            android:src="@drawable/main_calendar"
+            android:visibility="gone" />
 
         <LinearLayout
             style="@style/block"
@@ -99,6 +99,45 @@
                         app:item_icon_padding="15dp" />
                 </LinearLayout>
 
+            </androidx.cardview.widget.CardView>
+
+            <TextView
+                android:id="@+id/hasUrls"
+                style="@style/block_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/event_links" />
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/linksWrapper"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <net.innoflash.iosview.lists.ListItemView
+                        android:id="@+id/eventLink"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:scaleType="centerInside"
+                        app:liv_circular_image="false"
+                        app:liv_icon="@drawable/external_link"
+                        app:liv_icon_padding="@dimen/dimen10"
+                        app:liv_text="@string/visit_link" />
+
+                    <net.innoflash.iosview.lists.ListItemView
+                        android:id="@+id/eventVideoLink"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:scaleType="centerInside"
+                        app:liv_circular_image="false"
+                        app:liv_icon="@drawable/video_link"
+                        app:liv_icon_padding="@dimen/dimen10"
+                        app:liv_text="@string/watch_video" />
+                </LinearLayout>
             </androidx.cardview.widget.CardView>
         </LinearLayout>
 
