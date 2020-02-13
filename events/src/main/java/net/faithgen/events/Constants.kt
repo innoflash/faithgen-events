@@ -2,6 +2,8 @@ package net.faithgen.events
 
 class Constants {
     companion object{
+        const val FAILED_TO_ADD_CALENDAR: String = "Failed to add event to calendar!"
+        const val SUCCEEDED_TO_ADD_CALENDAR: String = "Your event has been added to your calendar, you can invite others from there too!"
         const val CALENDAR_PERMISSION: String = "Calendar permission!!"
         const val CALENDAR_PERMISSION_DENIED: String = "Denying permission to use calendar means you will not be able to add events from this app to your default calendar. Would you wanna enable the permission to use calendar now?"
         const val CALENDAR_DENIED_PERMISSION: String = "You ar not allowed to write to calendar, would you like to enable this app to use your calendar now?"

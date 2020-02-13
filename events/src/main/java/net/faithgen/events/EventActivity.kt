@@ -1,13 +1,18 @@
 package net.faithgen.events
 
 import android.Manifest
+import android.annotation.SuppressLint
+import android.content.ContentValues
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Bundle
+import android.provider.CalendarContract
 import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_event_details.*
 import net.faithgen.events.adapters.GuestsAdapter
+import net.faithgen.events.models.Date
 import net.faithgen.events.models.Event
 import net.faithgen.sdk.FaithGenActivity
 import net.faithgen.sdk.SDK
@@ -22,11 +27,17 @@ import net.faithgen.sdk.menu.MenuItem
 import net.faithgen.sdk.singletons.GSONSingleton
 import net.faithgen.sdk.utils.Dialogs
 import net.faithgen.sdk.utils.Utils
+import java.text.SimpleDateFormat
+import java.util.*
 
+@SuppressLint("SimpleDateFormat")
 class EventActivity : FaithGenActivity() {
 
     private var event: Event? = null
     private val menuItems = mutableListOf<MenuItem>()
+    private val simpleDateFormat : SimpleDateFormat by lazy {
+        SimpleDateFormat("yyyy-MM-dd HH:mm")
+    }
     private val eventId: String by lazy {
         intent.getStringExtra(Constants.EVENT_ID)
     }
@@ -70,7 +81,25 @@ class EventActivity : FaithGenActivity() {
 
     private fun addToCalendar() {
         if (checkCallingOrSelfPermission(Manifest.permission.WRITE_CALENDAR) == PackageManager.PERMISSION_GRANTED) {
+            val calendarParams = ContentValues()
+            val timeZone = TimeZone.getDefault()
+            calendarParams.put(CalendarContract.Events.TITLE, event?.name)
+            calendarParams.put(CalendarContract.Events.CALENDAR_ID, 1)
+            calendarParams.put(CalendarContract.Events.DESCRIPTION, event?.description)
+            calendarParams.put(CalendarContract.Events.DTSTART, getDateInMilliSeconds(event!!.start))
+            calendarParams.put(CalendarContract.Events.DTEND, getDateInMilliSeconds(event!!.end))
+            calendarParams.put(
+                CalendarContract.Events.EVENT_LOCATION,
+                event?.location?.address?.formatted
+            )
+            calendarParams.put(CalendarContract.Events.EVENT_TIMEZONE, timeZone.id)
 
+            val uri: Uri? =
+                contentResolver.insert(CalendarContract.Events.CONTENT_URI, calendarParams)
+            when(uri){
+                null -> Dialogs.showOkDialog(this, Constants.FAILED_TO_ADD_CALENDAR, false)
+                else -> Dialogs.showOkDialog(this, Constants.SUCCEEDED_TO_ADD_CALENDAR, false)
+            }
         } else Dialogs.confirmDialog(
             this,
             Constants.CALENDAR_PERMISSION,
@@ -80,6 +109,12 @@ class EventActivity : FaithGenActivity() {
                     Utils.openSettings(this@EventActivity)
                 }
             })
+    }
+
+    private fun getDateInMilliSeconds(date : Date) : Long {
+        val sanitizedDate : String = date.exact.substring(0, date.exact.indexOf('T')) + " ${date.time}"
+        val requiredDate: java.util.Date? = simpleDateFormat.parse(sanitizedDate)
+        return requiredDate!!.time;
     }
 
     private fun openComments() {
