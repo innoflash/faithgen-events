@@ -36,13 +36,12 @@ class EventActivity : FaithGenActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_event_details)
         eventGuests.layoutManager = LinearLayoutManager(this)
-
-        initMenu()
     }
 
     private fun initMenu() {
         menuItems.add(MenuItem(R.drawable.ic_comment_24, Constants.COMMENT))
-      //  if (event?.video_url !== null)
+        menuItems.add(MenuItem(R.drawable.ic_share, Constants.INVITE_OTHERS))
+        if (event?.video_url !== null)
             menuItems.add(MenuItem(R.drawable.ic_watch_video, Constants.WATCH_VIDEO))
         val menu = MenuFactory.initializeMenu(this, menuItems)
 
@@ -57,7 +56,8 @@ class EventActivity : FaithGenActivity() {
                         .setCommentsDisplay(CommentsDisplay.DIALOG)
                         .build()
                 )
-                1 -> Utils.openURL(this@EventActivity, event!!.video_url)
+                1 -> Utils.shareText(this@EventActivity, getInvitation())
+                2 -> Utils.openURL(this@EventActivity, event!!.video_url)
             }
         }
 
@@ -68,6 +68,12 @@ class EventActivity : FaithGenActivity() {
         super.onStart()
         if (event === null) getEvent()
     }
+
+    private fun getInvitation() =
+        "Hey there, i am inviting you to an event named \"${event?.name}\" hosted by ${SDK.getMinistry().name}\n" +
+                "Its taking place on ${event?.start?.formatted} starting at ${event?.start?.time}\n\n" +
+                "For more information visit:\n" +
+                "https://faithgen.com/events/$eventId"
 
     private fun getEvent() {
         API.get(
@@ -80,6 +86,7 @@ class EventActivity : FaithGenActivity() {
                     event =
                         GSONSingleton.getInstance().gson.fromJson(serverResponse, Event::class.java)
                     renderEvent(event)
+                    initMenu()
                 }
 
                 override fun onError(errorResponse: ErrorResponse?) {
