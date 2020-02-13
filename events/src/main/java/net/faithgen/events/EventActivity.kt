@@ -40,19 +40,24 @@ class EventActivity : FaithGenActivity() {
         initMenu()
     }
 
-    private fun initMenu(){
+    private fun initMenu() {
         menuItems.add(MenuItem(R.drawable.ic_comment_24, Constants.COMMENT))
+      //  if (event?.video_url !== null)
+            menuItems.add(MenuItem(R.drawable.ic_watch_video, Constants.WATCH_VIDEO))
         val menu = MenuFactory.initializeMenu(this, menuItems)
 
         menu.setOnMenuItemListener(Constants.MENU) { menuItem, position ->
-            when(position){
-                0 -> SDK.openComments(this@EventActivity,
+            when (position) {
+                0 -> SDK.openComments(
+                    this@EventActivity,
                     CommentsSettings.Builder()
                         .setTitle(event!!.name)
                         .setItemId(eventId)
                         .setCategory("events/")
                         .setCommentsDisplay(CommentsDisplay.DIALOG)
-                        .build())
+                        .build()
+                )
+                1 -> Utils.openURL(this@EventActivity, event!!.video_url)
             }
         }
 
