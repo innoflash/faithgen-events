@@ -3,7 +3,7 @@ package net.faithgen.events
 import android.os.Bundle
 import android.view.View
 import com.squareup.picasso.Picasso
-import kotlinx.android.synthetic.main.dialog_event_details.*
+import kotlinx.android.synthetic.main.activity_event_details.*
 import net.faithgen.events.models.Event
 import net.faithgen.sdk.FaithGenActivity
 import net.faithgen.sdk.http.API
@@ -25,7 +25,7 @@ class EventActivity :FaithGenActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.dialog_event_details)
+        setContentView(R.layout.activity_event_details)
     }
 
     override fun onStart() {

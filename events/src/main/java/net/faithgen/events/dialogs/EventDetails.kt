@@ -1,12 +1,10 @@
 package net.faithgen.events.dialogs
 
-import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import androidx.core.content.ContextCompat
 import net.faithgen.events.R
 import net.faithgen.events.models.Event
 import net.innoflash.iosview.DialogFullScreen
@@ -28,7 +26,7 @@ class EventDetails(val event: Event) : DialogFullScreen() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val rootView = inflater.inflate(R.layout.dialog_event_details, container, false)
+        val rootView = inflater.inflate(R.layout.activity_event_details, container, false)
         //dialogToolbar = rootView.findViewById(R.id.dialogToolbar) as DialogToolbar
         eventName = rootView.findViewById(R.id.eventName) as TextView
         eventDescription = rootView.findViewById(R.id.eventDescription) as TextView

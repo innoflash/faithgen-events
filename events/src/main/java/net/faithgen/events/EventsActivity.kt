@@ -24,6 +24,7 @@ import java.util.*
 class EventsActivity : FaithGenActivity(), EventsCalendar.Callback, RecyclerViewClickListener {
     private var params = hashMapOf<String, String>()
     private var eventsList: List<Event>? = null
+    private var dateEvents: List<Event>? = null
     private var eventsData: EventsData? = null
     private var queriedDate: String? = null
 
@@ -151,10 +152,11 @@ class EventsActivity : FaithGenActivity(), EventsCalendar.Callback, RecyclerView
     }
 
     private fun getDailyEvents(selectedDate: Calendar?) : List<Event>{
-        return eventsList!!.filter {
+        dateEvents = eventsList!!.filter {
             val startWith = "${selectedDate!!.get(Calendar.YEAR)}-${getMonth(selectedDate)}-${getDay(selectedDate)}"
             it.start.exact.startsWith(startWith)
         }
+        return dateEvents!!
     }
 
     private fun getMonth(selectedDate: Calendar?) : String {
@@ -173,7 +175,7 @@ class EventsActivity : FaithGenActivity(), EventsCalendar.Callback, RecyclerView
 
     override fun onClick(view: View?, position: Int) {
         val intent : Intent = Intent(this, EventActivity::class.java)
-        intent.putExtra(Constants.EVENT_ID, eventsList!!.get(position).id)
+        intent.putExtra(Constants.EVENT_ID, dateEvents!!.get(position).id)
         startActivity(intent)
     }
 
