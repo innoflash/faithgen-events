@@ -9,6 +9,9 @@ import android.os.Bundle
 import android.provider.CalendarContract
 import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.gms.maps.*
+import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.MarkerOptions
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_event_details.*
 import net.faithgen.events.adapters.GuestsAdapter
@@ -31,12 +34,15 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 @SuppressLint("SimpleDateFormat")
-class EventActivity : FaithGenActivity() {
+class EventActivity : FaithGenActivity(), OnMapReadyCallback {
 
     private var event: Event? = null
     private val menuItems = mutableListOf<MenuItem>()
-    private val simpleDateFormat : SimpleDateFormat by lazy {
+    private val simpleDateFormat: SimpleDateFormat by lazy {
         SimpleDateFormat("yyyy-MM-dd HH:mm")
+    }
+    private val mapFragment: SupportMapFragment by lazy {
+        supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
     }
     private val eventId: String by lazy {
         intent.getStringExtra(Constants.EVENT_ID)
@@ -86,7 +92,10 @@ class EventActivity : FaithGenActivity() {
             calendarParams.put(CalendarContract.Events.TITLE, event?.name)
             calendarParams.put(CalendarContract.Events.CALENDAR_ID, 1)
             calendarParams.put(CalendarContract.Events.DESCRIPTION, event?.description)
-            calendarParams.put(CalendarContract.Events.DTSTART, getDateInMilliSeconds(event!!.start))
+            calendarParams.put(
+                CalendarContract.Events.DTSTART,
+                getDateInMilliSeconds(event!!.start)
+            )
             calendarParams.put(CalendarContract.Events.DTEND, getDateInMilliSeconds(event!!.end))
             calendarParams.put(
                 CalendarContract.Events.EVENT_LOCATION,
@@ -96,7 +105,7 @@ class EventActivity : FaithGenActivity() {
 
             val uri: Uri? =
                 contentResolver.insert(CalendarContract.Events.CONTENT_URI, calendarParams)
-            when(uri){
+            when (uri) {
                 null -> Dialogs.showOkDialog(this, Constants.FAILED_TO_ADD_CALENDAR, false)
                 else -> Dialogs.showOkDialog(this, Constants.SUCCEEDED_TO_ADD_CALENDAR, false)
             }
@@ -111,8 +120,9 @@ class EventActivity : FaithGenActivity() {
             })
     }
 
-    private fun getDateInMilliSeconds(date : Date) : Long {
-        val sanitizedDate : String = date.exact.substring(0, date.exact.indexOf('T')) + " ${date.time}"
+    private fun getDateInMilliSeconds(date: Date): Long {
+        val sanitizedDate: String =
+            date.exact.substring(0, date.exact.indexOf('T')) + " ${date.time}"
         val requiredDate: java.util.Date? = simpleDateFormat.parse(sanitizedDate)
         return requiredDate!!.time;
     }
@@ -172,6 +182,8 @@ class EventActivity : FaithGenActivity() {
         eventLocation.itemContent = event?.location?.locality
         eventLocation.itemFooter = event?.location?.country
 
+        mapFragment.getMapAsync(this)
+
         /**
          * Displays the guests
          */
@@ -221,6 +233,22 @@ class EventActivity : FaithGenActivity() {
                     Utils.openURL(this@EventActivity, event.video_url)
                 }
             }
+        }
+    }
+
+    override fun onMapReady(googleMap: GoogleMap) {
+        if(event !== null){
+            val position = LatLng(
+                event!!.location.coordinates.lat,
+                event!!.location.coordinates.lng
+            )
+            googleMap.setContentDescription(event?.name)
+            googleMap.addMarker(
+                MarkerOptions().position(position).draggable(false).snippet(event!!.name)
+            )
+            googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(position, 15f))
+            googleMap.isMyLocationEnabled = false
+            googleMap.uiSettings.isScrollGesturesEnabled = false
         }
     }
 }

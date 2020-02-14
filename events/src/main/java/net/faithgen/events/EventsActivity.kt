@@ -209,7 +209,7 @@ class EventsActivity : FaithGenActivity(), EventsCalendar.Callback, RecyclerView
     }
 
     override fun onPermissionGranted(response: PermissionGrantedResponse?) {
-        Toast.makeText(this, "Good to go", Toast.LENGTH_SHORT).show()
+        //Toast.makeText(this, "Good to go", Toast.LENGTH_SHORT).show()
     }
 
     override fun onPermissionRationaleShouldBeShown(
