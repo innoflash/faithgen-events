@@ -4,6 +4,7 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.squareup.picasso.Picasso
 import net.faithgen.events.R
 import net.faithgen.events.models.Event
 import net.faithgen.events.view_holders.LI3Holder
@@ -32,13 +33,24 @@ class EventsAdapter(private val context: Context, private val events: List<Event
     }
 
     override fun onBindViewHolder(holder: LI3Holder, position: Int) {
+        val event = events.get(position)
+
         holder.itemView3.itemHeading = SDK.getMinistry().name
-        holder.itemView3.itemContent = events.get(position).name
-        holder.itemView3.itemFooter = events.get(position).date
-        if (events.get(position).is_past) {
+        holder.itemView3.itemContent = event.name
+        holder.itemView3.itemFooter = event.date
+        if (event.is_past) {
             holder.itemView3.isHasType = true
             holder.itemView3.badge = "past"
             holder.itemView3.itemType = ListItemView3.ItemType.RED
+        }
+
+        if(event.avatar !== null) {
+            holder.itemView3.isCircularImage = true
+            Picasso.get()
+                .load(event.avatar._50)
+                .placeholder(R.drawable.main_calendar)
+                .error(R.drawable.main_calendar)
+                .into(holder.itemView3.circleImageView)
         }
     }
 }
