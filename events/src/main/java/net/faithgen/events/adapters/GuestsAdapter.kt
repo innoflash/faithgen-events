@@ -10,7 +10,7 @@ import net.faithgen.events.models.Guest
 import net.faithgen.events.view_holders.LI3Holder
 import net.innoflash.iosview.lists.ListItemView3
 
-class GuestsAdapter(val context: Context, val guests: List<Guest>): RecyclerView.Adapter<LI3Holder>(){
+final class GuestsAdapter(val context: Context, val guests: List<Guest>): RecyclerView.Adapter<LI3Holder>(){
     private val layoutInflater : LayoutInflater by lazy {
         LayoutInflater.from(context)
     }

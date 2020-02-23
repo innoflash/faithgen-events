@@ -12,7 +12,7 @@ import net.innoflash.iosview.DialogToolbar
 import net.innoflash.iosview.lists.ListItemView2
 import net.innoflash.iosview.lists.ListItemView3
 
-class EventDetails(val event: Event) : DialogFullScreen() {
+final class EventDetails(private val event: Event) : DialogFullScreen() {
 
     private var dialogToolbar: DialogToolbar? = null
     private var eventName: TextView? = null

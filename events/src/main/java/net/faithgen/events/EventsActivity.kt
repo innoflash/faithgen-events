@@ -21,6 +21,7 @@ import net.faithgen.events.models.EventsData
 import net.faithgen.sdk.FaithGenActivity
 import net.faithgen.sdk.http.API
 import net.faithgen.sdk.http.ErrorResponse
+import net.faithgen.sdk.http.FaithGenAPI
 import net.faithgen.sdk.http.types.ServerResponse
 import net.faithgen.sdk.interfaces.DialogListener
 import net.faithgen.sdk.singletons.GSONSingleton
@@ -30,14 +31,17 @@ import net.innoflash.iosview.recyclerview.RecyclerTouchListener
 import net.innoflash.iosview.recyclerview.RecyclerViewClickListener
 import java.lang.Exception
 import java.util.*
+import kotlin.collections.HashMap
 
-class EventsActivity : FaithGenActivity(), EventsCalendar.Callback, RecyclerViewClickListener,
+final class EventsActivity : FaithGenActivity(), EventsCalendar.Callback, RecyclerViewClickListener,
     PermissionListener {
     private var params = hashMapOf<String, String>()
     private var eventsList: List<Event>? = null
     private var dateEvents: List<Event>? = null
     private var eventsData: EventsData? = null
     private var queriedDate: String? = null
+
+    private val faithGenAPI: FaithGenAPI by lazy { FaithGenAPI(this) }
 
     override fun getPageTitle(): String {
         return Constants.EVENTS
@@ -53,7 +57,13 @@ class EventsActivity : FaithGenActivity(), EventsCalendar.Callback, RecyclerView
         // toolbar.visibility = View.GONE
 
         eventsView.layoutManager = LinearLayoutManager(this)
-        eventsView.addOnItemTouchListener(RecyclerTouchListener(this@EventsActivity, eventsView, this))
+        eventsView.addOnItemTouchListener(
+            RecyclerTouchListener(
+                this@EventsActivity,
+                eventsView,
+                this
+            )
+        )
 
         selected.text = getDateString(eventsCalendar.getCurrentSelectedDate()?.timeInMillis)
 
@@ -78,30 +88,39 @@ class EventsActivity : FaithGenActivity(), EventsCalendar.Callback, RecyclerView
             .withPermission(Manifest.permission.WRITE_CALENDAR)
             .withListener(this)
             .check()
-        if(eventsList === null){
+        if (eventsList === null) {
             clearEvents()
             loadEvents(Calendar.getInstance())
         }
+    }
+
+    override fun onStop() {
+        super.onStop()
+        faithGenAPI.cancelRequests()
     }
 
     private fun loadEvents(currentDate: Calendar?) {
         val date = "${currentDate!!.get(Calendar.YEAR)}-${getMonth(currentDate)}-01"
         queriedDate = date
         params.put("date", date)
-        API.get(this, Constants.ALL_EVENTS, params, false, object : ServerResponse() {
-            override fun onServerResponse(serverResponse: String?) {
-                eventsData = GSONSingleton.getInstance().gson.fromJson(
-                    serverResponse,
-                    EventsData::class.java
-                )
-                eventsList = eventsData!!.events
-                showEventsOnCalendar()
-            }
+        faithGenAPI
+            .setProcess(Constants.FETCHING_EVENTS)
+            .setParams(params)
+            .setServerResponse(object : ServerResponse() {
+                override fun onServerResponse(serverResponse: String?) {
+                    eventsData = GSONSingleton.instance.gson.fromJson(
+                        serverResponse,
+                        EventsData::class.java
+                    )
+                    eventsList = eventsData!!.events
+                    showEventsOnCalendar()
+                }
 
-            override fun onError(errorResponse: ErrorResponse?) {
-                Dialogs.showOkDialog(this@EventsActivity, errorResponse!!.message, false)
-            }
-        })
+                override fun onError(errorResponse: ErrorResponse?) {
+                    Dialogs.showOkDialog(this@EventsActivity, errorResponse!!.message, false)
+                }
+            })
+            .request(Constants.ALL_EVENTS)
     }
 
     private fun showEventsOnCalendar() {
@@ -161,7 +180,8 @@ class EventsActivity : FaithGenActivity(), EventsCalendar.Callback, RecyclerView
                 dailyEvents
             )
             eventsView.adapter = adapter
-        }catch (ex : Exception){}
+        } catch (ex: Exception) {
+        }
     }
 
     override fun onMonthChanged(monthStartDate: Calendar?) {
@@ -169,30 +189,33 @@ class EventsActivity : FaithGenActivity(), EventsCalendar.Callback, RecyclerView
         loadEvents(monthStartDate)
     }
 
-    private fun getDailyEvents(selectedDate: Calendar?) : List<Event>{
+    private fun getDailyEvents(selectedDate: Calendar?): List<Event> {
         dateEvents = eventsList!!.filter {
-            val startWith = "${selectedDate!!.get(Calendar.YEAR)}-${getMonth(selectedDate)}-${getDay(selectedDate)}"
+            val startWith =
+                "${selectedDate!!.get(Calendar.YEAR)}-${getMonth(selectedDate)}-${getDay(
+                    selectedDate
+                )}"
             it.start.exact.startsWith(startWith)
         }
         return dateEvents!!
     }
 
-    private fun getMonth(selectedDate: Calendar?) : String {
+    private fun getMonth(selectedDate: Calendar?): String {
         var currentMonth = selectedDate!!.get(Calendar.MONTH) + 1
-        if(currentMonth > 12) currentMonth = 1
+        if (currentMonth > 12) currentMonth = 1
 
-        if(currentMonth.toString().length < 2) return "0${currentMonth}"
+        if (currentMonth.toString().length < 2) return "0${currentMonth}"
         return currentMonth.toString()
     }
 
-    private fun getDay(selectedDate: Calendar?) : String {
-        if(selectedDate!!.get(Calendar.DAY_OF_MONTH).toString().length < 2)
+    private fun getDay(selectedDate: Calendar?): String {
+        if (selectedDate!!.get(Calendar.DAY_OF_MONTH).toString().length < 2)
             return "0${selectedDate.get(Calendar.DAY_OF_MONTH)}"
         return selectedDate.get(Calendar.DAY_OF_MONTH).toString()
     }
 
     override fun onClick(view: View?, position: Int) {
-        val intent : Intent = Intent(this, EventActivity::class.java)
+        val intent: Intent = Intent(this, EventActivity::class.java)
         intent.putExtra(Constants.EVENT_ID, dateEvents!!.get(position).id)
         startActivity(intent)
     }
@@ -201,7 +224,7 @@ class EventsActivity : FaithGenActivity(), EventsCalendar.Callback, RecyclerView
         //leave as is
     }
 
-    private fun clearEvents(){
+    private fun clearEvents() {
         eventsView.adapter = EventsAdapter(
             this@EventsActivity,
             listOf()
@@ -220,10 +243,14 @@ class EventsActivity : FaithGenActivity(), EventsCalendar.Callback, RecyclerView
     }
 
     override fun onPermissionDenied(response: PermissionDeniedResponse?) {
-        Dialogs.confirmDialog(this, Constants.CALENDAR_PERMISSION, Constants.CALENDAR_PERMISSION_DENIED, object : DialogListener() {
-            override fun onYes() {
-                Utils.openSettings(this@EventsActivity)
-            }
-        })
+        Dialogs.confirmDialog(
+            this,
+            Constants.CALENDAR_PERMISSION,
+            Constants.CALENDAR_PERMISSION_DENIED,
+            object : DialogListener() {
+                override fun onYes() {
+                    Utils.openSettings(this@EventsActivity)
+                }
+            })
     }
 }

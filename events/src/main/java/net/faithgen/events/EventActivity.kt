@@ -9,24 +9,27 @@ import android.os.Bundle
 import android.provider.CalendarContract
 import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.google.android.gms.maps.*
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.OnMapReadyCallback
+import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_event_details.*
 import net.faithgen.events.adapters.GuestsAdapter
-import net.faithgen.events.models.Date
 import net.faithgen.events.models.Event
 import net.faithgen.sdk.FaithGenActivity
 import net.faithgen.sdk.SDK
 import net.faithgen.sdk.comments.CommentsSettings
 import net.faithgen.sdk.enums.CommentsDisplay
-import net.faithgen.sdk.http.API
 import net.faithgen.sdk.http.ErrorResponse
+import net.faithgen.sdk.http.FaithGenAPI
 import net.faithgen.sdk.http.types.ServerResponse
 import net.faithgen.sdk.interfaces.DialogListener
 import net.faithgen.sdk.menu.MenuFactory
 import net.faithgen.sdk.menu.MenuItem
+import net.faithgen.sdk.models.Date
 import net.faithgen.sdk.singletons.GSONSingleton
 import net.faithgen.sdk.utils.Dialogs
 import net.faithgen.sdk.utils.Utils
@@ -34,10 +37,13 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 @SuppressLint("SimpleDateFormat")
-class EventActivity : FaithGenActivity(), OnMapReadyCallback {
+final class EventActivity : FaithGenActivity(), OnMapReadyCallback {
 
     private var event: Event? = null
     private val menuItems = mutableListOf<MenuItem>()
+
+    private val faithGenAPI: FaithGenAPI by lazy { FaithGenAPI(this) }
+
     private val simpleDateFormat: SimpleDateFormat by lazy {
         SimpleDateFormat("yyyy-MM-dd HH:mm")
     }
@@ -83,6 +89,11 @@ class EventActivity : FaithGenActivity(), OnMapReadyCallback {
     override fun onStart() {
         super.onStart()
         if (event === null) getEvent()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        faithGenAPI.cancelRequests()
     }
 
     private fun addToCalendar() {
@@ -147,14 +158,12 @@ class EventActivity : FaithGenActivity(), OnMapReadyCallback {
     }
 
     private fun getEvent() {
-        API.get(
-            this@EventActivity,
-            Constants.ALL_EVENTS + "/$eventId",
-            null,
-            false,
-            object : ServerResponse() {
+        faithGenAPI
+            .setParams(null)
+            .setProcess(Constants.FETCHING_EVENT)
+            .setServerResponse(object : ServerResponse() {
                 override fun onServerResponse(serverResponse: String?) {
-                    event = GSONSingleton.getInstance().gson
+                    event = GSONSingleton.instance.gson
                         .fromJson(serverResponse, Event::class.java)
                     renderEvent(event)
                     initMenu()
@@ -165,6 +174,7 @@ class EventActivity : FaithGenActivity(), OnMapReadyCallback {
                     Dialogs.showOkDialog(this@EventActivity, errorResponse?.message, true)
                 }
             })
+            .request(Constants.ALL_EVENTS + "/$eventId")
     }
 
     private fun displayGuests() {
@@ -217,7 +227,7 @@ class EventActivity : FaithGenActivity(), OnMapReadyCallback {
             /**
              * Shows the link if there
              */
-            when (event?.url) {
+            when (event.url) {
                 null -> eventLink.visibility = View.GONE
                 else -> eventLink.setOnClickListener { view ->
                     Utils.openURL(this@EventActivity, event.url)
@@ -237,7 +247,7 @@ class EventActivity : FaithGenActivity(), OnMapReadyCallback {
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
-        if(event !== null){
+        if (event !== null) {
             val position = LatLng(
                 event!!.location.coordinates.lat,
                 event!!.location.coordinates.lng

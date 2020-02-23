@@ -1,6 +1,7 @@
 package net.faithgen.events.models
 
 import net.faithgen.sdk.models.Avatar
+import net.faithgen.sdk.models.Date
 
 data class Event(
     val id: String,

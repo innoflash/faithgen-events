@@ -11,7 +11,7 @@ import net.faithgen.events.view_holders.LI3Holder
 import net.faithgen.sdk.SDK
 import net.innoflash.iosview.lists.ListItemView3
 
-class EventsAdapter(private val context: Context, private val events: List<Event>) :
+final class EventsAdapter(private val context: Context, private val events: List<Event>) :
     RecyclerView.Adapter<LI3Holder>() {
 
     private val layoutInflater: LayoutInflater by lazy {
@@ -42,7 +42,7 @@ class EventsAdapter(private val context: Context, private val events: List<Event
             holder.itemView3.itemType = ListItemView3.ItemType.RED
         }
 
-        if(event.avatar !== null) {
+        if(event.avatar != null) {
             holder.itemView3.isCircularImage = true
             Picasso.get()
                 .load(event.avatar._50)
