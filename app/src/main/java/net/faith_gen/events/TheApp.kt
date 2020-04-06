@@ -17,7 +17,7 @@ class TheApp : Application() {
                 resources.getString(R.color.colorPrimary),
                 null
             )
-            SDK.initializeApiBase("http://192.168.8.102:8001/api/")
+            SDK.initializeApiBase("http://192.168.8.101:8001/api/")
         } catch (e: IOException) {
             e.printStackTrace()
         }
