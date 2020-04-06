@@ -3,6 +3,7 @@ package net.faithgen.events
 import android.Manifest
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -15,11 +16,9 @@ import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.single.PermissionListener
 import kotlinx.android.synthetic.main.activity_events.*
 import net.faithgen.events.adapters.EventsAdapter
-import net.faithgen.events.models.APIDate
 import net.faithgen.events.models.Event
 import net.faithgen.events.models.EventsData
 import net.faithgen.sdk.FaithGenActivity
-import net.faithgen.sdk.http.API
 import net.faithgen.sdk.http.ErrorResponse
 import net.faithgen.sdk.http.FaithGenAPI
 import net.faithgen.sdk.http.types.ServerResponse
@@ -31,7 +30,6 @@ import net.innoflash.iosview.recyclerview.RecyclerTouchListener
 import net.innoflash.iosview.recyclerview.RecyclerViewClickListener
 import java.lang.Exception
 import java.util.*
-import kotlin.collections.HashMap
 
 final class EventsActivity : FaithGenActivity(), EventsCalendar.Callback, RecyclerViewClickListener,
     PermissionListener {
@@ -126,22 +124,10 @@ final class EventsActivity : FaithGenActivity(), EventsCalendar.Callback, Recycl
     private fun showEventsOnCalendar() {
         val c = Calendar.getInstance()
         //eventsCalendar.clearEvents()
-/*        eventsList!!.forEach {
-            val c = Calendar.getInstance()
-            //   c[Calendar.YEAR] = getAPIDate().year
-           // c[Calendar.MONTH] = getAPIDate().month
-            c[Calendar.DAY_OF_MONTH] = 15
-            eventsCalendar.addEvent(c)
-        }*/
-    }
-
-    private fun getAPIDate(): APIDate {
-        var apiDate: APIDate = APIDate()
-        var splitDate = queriedDate!!.split("-").toTypedArray()
-        apiDate.year = Integer.parseInt(splitDate.get(0))
-        apiDate.month = Integer.parseInt(splitDate.get(1))
-        apiDate.date = Integer.parseInt(splitDate.get(2))
-        return apiDate
+       eventsList!!.forEach {event ->
+           Log.d("the date", event.date)
+            eventsCalendar.addEvent(event.date)
+        }
     }
 
     private fun getDateString(time: Long?): String {
@@ -168,6 +154,8 @@ final class EventsActivity : FaithGenActivity(), EventsCalendar.Callback, Recycl
     }
 
     override fun onDayLongPressed(selectedDate: Calendar?) {
+        Toast.makeText(this, "long clicked", Toast.LENGTH_LONG).show()
+        eventsCalendar.post { eventsCalendar.addEvent("2020/04/15") }
 
     }
 
